@@ -1,9 +1,7 @@
 # DeepSeek - Microservices Architecture
 
 ## Team 
-- Rouaa Mahmoudi (3IDL1)  
 - Sarah Hosni (3IDL1)  
-- Maha Houidi (3IDL1)
 
 ---
 
