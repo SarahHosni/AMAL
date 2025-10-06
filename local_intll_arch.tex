@@ -1,0 +1,149 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{tikz}
+\usepackage[margin=1.6cm]{geometry}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usetikzlibrary{positioning, shapes, arrows, fit, backgrounds}
+
+\begin{document}
+
+\begin{center}
+    {\Large \bf DeepSeek – Local Intelligent Architecture}\\[0.5em]
+    {\small On-Premise Learning and Feedback-Driven System}
+\end{center}
+
+\vspace{0.6cm}
+
+% ======= STYLES =======
+\tikzset{
+    layer/.style={font=\bfseries\footnotesize, align=center},
+    component/.style={
+        draw, thick, rounded corners, align=center,
+        fill=#1!15,
+        inner sep=4pt,
+        font=\scriptsize
+    },
+    line/.style={->, thick, >=stealth},
+    dottedline/.style={->, thick, >=stealth, dashed},
+    layerbox/.style={
+        draw, thick, rounded corners, fill=#1!5, 
+        inner sep=0.25cm,
+        label={[anchor=north,font=\scriptsize\bfseries]above:#2},
+        on background layer
+    }
+}
+
+\begin{center}
+\begin{tikzpicture}[node distance=0.9cm and 1.3cm]
+
+% ================= ACCESS LAYER =================
+\node[layer] (accessLabel) {Access Layer};
+\node[component=gray, below=0.25cm of accessLabel, xshift=-2.5cm] (web) {Web Client};
+\node[component=gray, below=0.25cm of accessLabel] (desktop) {Desktop App};
+\node[component=gray, below=0.25cm of accessLabel, xshift=2.5cm] (api) {Local API};
+
+\begin{scope}[on background layer]
+    \node[layerbox=gray, label=Access Layer, fit=(accessLabel)(web)(api)] {};
+\end{scope}
+
+% ================= LOCAL GATEWAY =================
+\node[layer, below=1.0cm of desktop] (gatewayLabel) {Local Gateway};
+\node[component=blue, below=0.25cm of gatewayLabel] (gateway)
+{Request Routing \\ Auth, Logging, Load Mgmt};
+
+\begin{scope}[on background layer]
+    \node[layerbox=blue, label=Gateway, fit=(gatewayLabel)(gateway)] {};
+\end{scope}
+
+% ================= CORE SERVICES =================
+\node[layer, below=1.3cm of gateway] (coreLabel) {Application & ML Core};
+\node[component=green, below=0.25cm of coreLabel, xshift=-3.8cm] (user) {User Service};
+\node[component=green, right=0.7cm of user] (search) {Search Engine};
+\node[component=green, right=0.7cm of search] (ml) {Inference Engine};
+\node[component=green, right=0.7cm of ml] (notif) {Notifications};
+\node[component=green, right=0.7cm of notif] (billing) {Billing};
+
+\begin{scope}[on background layer]
+    \node[layerbox=green, label=Core Services, fit=(coreLabel)(billing)(user)] {};
+\end{scope}
+
+% ================= INTELLIGENT LAYER =================
+\node[layer, below=1.4cm of search] (aiLabel) {Intelligent Learning Layer};
+\node[component=orange, below=0.25cm of aiLabel, xshift=-3.0cm] (feature) {Feature Store};
+\node[component=orange, right=0.7cm of feature] (train) {Training Module};
+\node[component=orange, right=0.7cm of train] (model) {Model Registry};
+\node[component=orange, right=0.7cm of model] (feedback) {Feedback Collector};
+
+\begin{scope}[on background layer]
+    \node[layerbox=orange, label=Intelligent Layer, fit=(aiLabel)(feedback)(feature)] {};
+\end{scope}
+
+% ================= LOCAL STORAGE =================
+\node[layer, below=1.3cm of train] (infraLabel) {Local Infrastructure};
+\node[component=purple, below=0.25cm of infraLabel, xshift=-2.8cm] (db) {Local Database};
+\node[component=purple, right=0.7cm of db] (storage) {File System};
+\node[component=purple, right=0.7cm of storage] (monitor) {Monitoring};
+
+\begin{scope}[on background layer]
+    \node[layerbox=purple, label=Infrastructure, fit=(infraLabel)(monitor)(db)] {};
+\end{scope}
+
+% ================= CONNECTIONS =================
+\draw[line] (web) -- (gateway);
+\draw[line] (desktop) -- (gateway);
+\draw[line] (api) -- (gateway);
+
+\foreach \x in {user,search,ml,notif,billing}{
+    \draw[line] (gateway.south) -- (\x.north);
+}
+
+\foreach \x in {feature,train,model,feedback}{
+    \draw[line] (ml.south) -- (\x.north);
+}
+
+\draw[line] (train.south) -- (db.north);
+\draw[line] (feature.south) -- (storage.north);
+\draw[line] (feedback.south) -- (db.north);
+
+% Feedback loop to inference
+\draw[dottedline, bend left=15] (feedback.north east) to (ml.south east);
+\draw[dottedline, bend right=15] (model.north west) to (ml.south west);
+
+% ================= LEGEND =================
+\node[draw, rounded corners, fill=white, below right=0.4cm and -1.5cm of monitor, font=\tiny, align=left, text width=3.6cm] (legend) {
+\textbf{Legend:}\\
+\textcolor{gray!80!black}{Gray} – Access Layer\\
+\textcolor{blue!80!black}{Blue} – Gateway\\
+\textcolor{green!60!black}{Green} – Core Services\\
+\textcolor{orange!80!black}{Orange} – Intelligent Layer\\
+\textcolor{purple!80!black}{Purple} – Local Infrastructure
+};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.6cm}
+\noindent\rule{\textwidth}{0.4pt}
+
+\begin{minipage}{\textwidth}
+\small
+\textbf{Description of the Local Intelligent Architecture:}\\[0.3em]
+This architecture enhances the local version of DeepSeek by integrating \textbf{machine learning and self-improvement capabilities}.  
+It remains fully deployable on a single server or local cluster, maintaining modularity and simplicity while enabling autonomous learning.
+
+\textbf{Access Layer:} Provides local access through web, desktop, or API interfaces.  
+\textbf{Local Gateway:} Manages routing, authentication, and request logging within a single environment.  
+\textbf{Application \& ML Core:} Offers core functionalities (user, search, inference, notifications, billing) and uses the inference engine for AI-driven recommendations or analysis.  
+\textbf{Intelligent Learning Layer:} Introduces intelligence through four key components:
+- \textit{Feature Store:} Stores preprocessed features extracted from local data.  
+- \textit{Training Module:} Retrains models periodically or when new feedback is available.  
+- \textit{Model Registry:} Manages model versions and handles automatic deployment to the inference engine.  
+- \textit{Feedback Collector:} Gathers user interactions and predictions to feed the training loop.
+
+\textbf{Local Infrastructure:} Hosts databases, file storage, and monitoring systems for logs, metrics, and model artifacts.
+
+This architecture transforms DeepSeek into a \textbf{self-learning system}: it collects data, learns locally, and continuously improves its predictions.  
+It is ideal for organizations needing privacy-preserving AI capabilities without relying on cloud resources — combining local control with adaptive intelligence.
+\end{minipage}
+
+\end{document}
