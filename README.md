@@ -205,3 +205,48 @@ The **parallel DeepSeek architecture** combines the best of both worlds:
 - the **power and efficiency** of parallel computing.  
 
 It is therefore **the most optimal architecture** for AI-driven, large-scale search and analysis platforms, capable of handling massive data volumes and intensive model computations efficiently and reliably.
+
+
+
+---
+
+## Local Architecture
+
+The **Local Architecture** of DeepSeek represents a simplified on-premise version of the platform, where all components (API Gateway, Core Services, Database, and Monitoring) run on a single physical or virtual machine.  
+This configuration is ideal for **development, testing, or academic environments** where ease of deployment and full control are prioritized over scalability.
+
+**Key Features:**
+- All services operate locally without cloud or distributed dependencies.  
+- Internal communication occurs via local network calls or IPC (Inter-Process Communication).  
+- Provides a fully functional system for rapid prototyping and offline experimentation.  
+
+This setup ensures **low latency, simplicity, and full data sovereignty**, making it suitable for internal research and small-scale AI applications.
+
+---
+
+## Local Intelligent Architecture
+
+The **Local Intelligent Architecture** extends the local version by integrating **machine learning and self-adaptation capabilities**.  
+It introduces an intelligent layer composed of a **Feature Store**, **Training Module**, **Model Registry**, and **Feedback Collector** — enabling DeepSeek to learn and improve directly from user interactions.
+
+**Key Features:**
+- **Feature Store:** Manages structured data used for model training.  
+- **Training Module:** Periodically retrains models using new local data.  
+- **Model Registry:** Tracks versions and automates model deployment.  
+- **Feedback Collector:** Captures user feedback to continuously refine model accuracy.
+
+This architecture turns DeepSeek into a **self-learning, privacy-preserving system** that evolves autonomously without cloud dependency.  
+It is ideal for environments where **data privacy**, **autonomous learning**, and **local control** are crucial.
+
+---
+
+### Summary Comparison
+
+| Architecture Type | Description | Use Case |
+|--------------------|-------------|-----------|
+| **Local Architecture** | Single-machine deployment for modular services | Development, internal testing, research |
+| **Local Intelligent Architecture** | Adds local AI learning and feedback loop | Adaptive systems, on-premise AI, privacy-focused environments |
+
+---
+
+
