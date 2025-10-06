@@ -1,6 +1,6 @@
 # DeepSeek - Microservices Architecture
 
-## Team 
+##Realized by
 - Sarah Hosni (3IDL1)  
 
 ---
