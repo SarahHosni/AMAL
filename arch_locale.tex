@@ -1,0 +1,120 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{tikz}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usetikzlibrary{positioning, shapes, arrows, fit, backgrounds}
+
+\begin{document}
+
+\begin{center}
+    {\Large \bf DeepSeek – Local Architecture}\\[0.5em]
+    {\small Simplified On-Premise Deployment Model}
+\end{center}
+
+\vspace{0.8cm}
+
+% ======= STYLES =======
+\tikzset{
+    layer/.style={font=\bfseries\footnotesize, align=center},
+    component/.style={
+        draw, thick, rounded corners, align=center,
+        fill=#1!15,
+        inner sep=4pt,
+        font=\scriptsize
+    },
+    line/.style={->, thick, >=stealth},
+    layerbox/.style={
+        draw, thick, rounded corners, fill=#1!5, 
+        inner sep=0.3cm,
+        label={[anchor=north,font=\scriptsize\bfseries]above:#2},
+        on background layer
+    }
+}
+
+\begin{center}
+\begin{tikzpicture}[node distance=0.9cm and 1.3cm]
+
+% ================= ACCESS LAYER =================
+\node[layer] (accessLabel) {Access Layer};
+\node[component=gray, below=0.25cm of accessLabel, xshift=-2.5cm] (web) {Web Client};
+\node[component=gray, below=0.25cm of accessLabel] (desktop) {Desktop App};
+\node[component=gray, below=0.25cm of accessLabel, xshift=2.5cm] (api) {Local API};
+
+\begin{scope}[on background layer]
+    \node[layerbox=gray, label=Access Layer, fit=(accessLabel)(web)(api)] {};
+\end{scope}
+
+% ================= LOCAL SERVER CORE =================
+\node[layer, below=1.1cm of desktop] (coreLabel) {Local Server Core};
+\node[component=blue, below=0.25cm of coreLabel] (gateway)
+{Local API Gateway \\ Routing, Auth, Logging};
+
+\begin{scope}[on background layer]
+    \node[layerbox=blue, label=API Gateway, fit=(coreLabel)(gateway)] {};
+\end{scope}
+
+% ================= CORE SERVICES =================
+\node[layer, below=1.3cm of gateway] (coreServiceLabel) {Application Services};
+\node[component=green, below=0.3cm of coreServiceLabel, xshift=-3.8cm] (users) {User Service};
+\node[component=green, right=0.7cm of users] (search) {Search Engine};
+\node[component=green, right=0.7cm of search] (ml) {ML Engine};
+\node[component=green, right=0.7cm of ml] (notif) {Notifications};
+\node[component=green, right=0.7cm of notif] (billing) {Billing};
+
+\begin{scope}[on background layer]
+    \node[layerbox=green, label=Core Services, fit=(coreServiceLabel)(billing)(users)] {};
+\end{scope}
+
+% ================= LOCAL STORAGE =================
+\node[layer, below=1.3cm of search] (storageLabel) {Local Infrastructure};
+\node[component=purple, below=0.25cm of storageLabel, xshift=-2.8cm] (db) {Local Database};
+\node[component=purple, right=0.6cm of db] (files) {File Storage};
+\node[component=purple, right=0.6cm of files] (monitor) {Local Monitoring};
+
+\begin{scope}[on background layer]
+    \node[layerbox=purple, label=Infrastructure, fit=(storageLabel)(monitor)(db)] {};
+\end{scope}
+
+% ================= CONNECTIONS =================
+\draw[line] (web) -- (gateway);
+\draw[line] (desktop) -- (gateway);
+\draw[line] (api) -- (gateway);
+\foreach \x in {users,search,ml,notif,billing}{
+    \draw[line] (gateway.south) -- (\x.north);
+    \draw[line] (\x.south) -- (db.north);
+}
+
+\draw[line] (ml.south) -- (files.north);
+\draw[line] (monitor.north) -- (gateway.south east);
+
+% ================= LEGEND =================
+\node[draw, rounded corners, fill=white, below right=0.4cm and -1.5cm of monitor, font=\tiny, align=left, text width=3.6cm] (legend) {
+\textbf{Legend:}\\
+\textcolor{gray!80!black}{Gray} – Access Layer\\
+\textcolor{blue!80!black}{Blue} – Gateway\\
+\textcolor{green!60!black}{Green} – Core Services\\
+\textcolor{purple!80!black}{Purple} – Local Infrastructure
+};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.6cm}
+\noindent\rule{\textwidth}{0.4pt}
+
+\begin{minipage}{\textwidth}
+\small
+\textbf{Description of the Local Architecture:}\\[0.3em]
+The \textit{local architecture} of DeepSeek is designed for small-scale environments, such as research labs, offline deployments, or development testing.  
+All system components run on a single physical or virtual server, ensuring simplicity, minimal latency, and ease of control without distributed infrastructure.
+
+\textbf{Access Layer:} Provides direct access through web, desktop, or local API clients, allowing users to interact with the system locally.  
+\textbf{Local API Gateway:} Handles all internal routing, authentication, and logging within a single node, without cloud-based load balancing.  
+\textbf{Core Services:} Each service (User, Search, ML, Notifications, Billing) operates as a local process or container. Communication occurs via internal network calls or IPC (inter-process communication).  
+\textbf{Local Infrastructure:} The database, file system, and monitoring tools are hosted locally. Data storage, logs, and models are maintained within the same machine or LAN network.
+
+This architecture prioritizes \textbf{simplicity, fast prototyping, and offline availability}. It avoids the complexity of distributed orchestration while retaining modularity, making it ideal for development, demonstration, or low-resource environments.
+\end{minipage}
+
+\end{document}
