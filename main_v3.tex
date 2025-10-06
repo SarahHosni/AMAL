@@ -1,0 +1,159 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{tikz}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usetikzlibrary{positioning, shapes, arrows, fit, backgrounds}
+
+\begin{document}
+
+\begin{center}
+    {\Large \bf DeepSeek – Parallel Architecture}\\[0.5em]
+    {\small Optimized Parallel Processing Design}
+\end{center}
+
+\vspace{0.8cm}
+
+% ======= STYLES =======
+\tikzset{
+    layer/.style={font=\bfseries\footnotesize, align=center},
+    component/.style={
+        draw, thick, rounded corners, align=center,
+        fill=#1!15,
+        inner sep=4pt,
+        font=\scriptsize
+    },
+    line/.style={->, thick, >=stealth},
+    layerbox/.style={
+        draw, thick, rounded corners, fill=#1!5, 
+        inner sep=0.3cm,
+        label={[anchor=north,font=\scriptsize\bfseries]above:#2},
+        on background layer
+    }
+}
+
+\begin{center}
+\begin{tikzpicture}[node distance=0.9cm and 1.3cm]
+
+% ================= ACCESS LAYER =================
+\node[layer] (accessLabel) {Access Layer};
+\node[component=gray, below=0.25cm of accessLabel, xshift=-2.6cm] (web) {Web Client};
+\node[component=gray, below=0.25cm of accessLabel] (mobile) {Mobile Client};
+\node[component=gray, below=0.25cm of accessLabel, xshift=2.6cm] (api) {External API};
+
+\begin{scope}[on background layer]
+    \node[layerbox=gray, label=Access Layer, fit=(accessLabel)(web)(api)] {};
+\end{scope}
+
+% ================= API GATEWAY =================
+\node[layer, below=1.1cm of mobile] (gatewayLabel) {API Gateway};
+\node[component=blue, below=0.25cm of gatewayLabel] (gateway)
+{Routing, Security, Load Balancing,\\Parallel Task Distribution};
+
+\begin{scope}[on background layer]
+    \node[layerbox=blue, label=API Gateway, fit=(gatewayLabel)(gateway)] {};
+\end{scope}
+
+% ================= PARALLEL CORE SERVICES =================
+\node[layer, below=1.3cm of gateway] (coreLabel) {Parallel Core Services};
+\node[component=green, below=0.3cm of coreLabel, xshift=-3.8cm] (users) {User Service};
+\node[component=green, right=0.7cm of users] (search) {Parallel Search Cluster};
+\node[component=green, right=0.7cm of search] (notif) {Notifications};
+\node[component=green, right=0.7cm of notif] (billing) {Billing};
+
+\begin{scope}[on background layer]
+    \node[layerbox=green, label=Core Services, fit=(coreLabel)(billing)(users)] {};
+\end{scope}
+
+% Parallel Search Nodes
+\node[component=green!40!white, below left=0.1cm and 0.4cm of search.south] (s1) {Search Node 1};
+\node[component=green!40!white, below=0.1cm of s1] (s2) {Search Node 2};
+\node[component=green!40!white, below=0.1cm of s2] (s3) {Search Node 3};
+\draw[line, dashed] (search.south) -- (s1.north);
+\draw[line, dashed] (search.south) -- (s2.north);
+\draw[line, dashed] (search.south) -- (s3.north);
+
+% ================= PARALLEL ML SUBSYSTEM =================
+\node[layer, below=2.3cm of search] (mlLabel) {Parallel ML Subsystem};
+\node[component=orange, below=0.3cm of mlLabel, xshift=-2cm] (train) {Parallel Training Cluster};
+\node[component=orange, right=0.6cm of train] (infer) {Parallel Inference Cluster};
+\node[component=orange, right=0.6cm of infer] (model) {Model Registry};
+
+\begin{scope}[on background layer]
+    \node[layerbox=orange, label=ML Subsystem, fit=(mlLabel)(model)(train)] {};
+\end{scope}
+
+% Parallel ML Nodes
+\node[component=orange!35!white, below left=0.1cm and 0.4cm of train.south] (t1) {GPU Node 1};
+\node[component=orange!35!white, below=0.1cm of t1] (t2) {GPU Node 2};
+\node[component=orange!35!white, below=0.1cm of t2] (t3) {GPU Node 3};
+\draw[line, dashed] (train.south) -- (t1.north);
+\draw[line, dashed] (train.south) -- (t2.north);
+\draw[line, dashed] (train.south) -- (t3.north);
+
+\node[component=orange!35!white, below right=0.1cm and 0.4cm of infer.south] (i1) {Node A};
+\node[component=orange!35!white, below=0.1cm of i1] (i2) {Node B};
+\node[component=orange!35!white, below=0.1cm of i2] (i3) {Node C};
+\draw[line, dashed] (infer.south) -- (i1.north);
+\draw[line, dashed] (infer.south) -- (i2.north);
+\draw[line, dashed] (infer.south) -- (i3.north);
+
+% ================= INFRASTRUCTURE =================
+\node[layer, below=3cm of mlLabel] (infraLabel) {Parallel Infrastructure};
+\node[component=purple, below=0.3cm of infraLabel, xshift=-2.8cm] (db) {Distributed DB};
+\node[component=purple, right=0.6cm of db] (broker) {Message Broker};
+\node[component=purple, right=0.6cm of broker] (scheduler) {Task Scheduler};
+\node[component=purple, right=0.6cm of scheduler] (kube) {Kubernetes Cluster};
+
+\begin{scope}[on background layer]
+    \node[layerbox=purple, label=Infrastructure, fit=(infraLabel)(kube)(db)] {};
+\end{scope}
+
+% ================= CONNECTIONS =================
+\draw[line] (web) -- (gateway);
+\draw[line] (mobile) -- (gateway);
+\draw[line] (api) -- (gateway);
+
+\draw[line] (gateway.south) -- (users.north);
+\draw[line] (gateway.south) -- (search.north);
+\draw[line] (gateway.south) -- (notif.north);
+\draw[line] (gateway.south) -- (billing.north);
+\draw[line] (gateway.south) -- (train.north);
+\draw[line] (gateway.south) -- (infer.north);
+
+\draw[line, dashed] (search.south) -- (broker.north);
+\draw[line, dashed] (train.south) -- (broker.north);
+\draw[line, dashed] (infer.south) -- (broker.north);
+
+% ================= LEGEND =================
+\node[draw, rounded corners, fill=white, below right=0.4cm and -1.5cm of kube, font=\tiny, align=left, text width=3.6cm] (legend) {
+\textbf{Legend:}\\
+\textcolor{gray!80!black}{Gray} – Access Layer\\
+\textcolor{blue!80!black}{Blue} – Gateway\\
+\textcolor{green!60!black}{Green} – Core Parallel Services\\
+\textcolor{orange!80!black}{Orange} – ML Parallel Subsystem\\
+\textcolor{purple!80!black}{Purple} – Infrastructure
+};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+\noindent\rule{\textwidth}{0.4pt}
+
+\begin{minipage}{\textwidth}
+\small
+\textbf{Description of the Parallel Architecture:}\\[0.3em]
+This proposed architecture transforms DeepSeek into a true \textit{parallel computing system}.  
+While maintaining a modular microservices organization, it introduces \textbf{intra-service parallelism} to accelerate data-intensive and AI tasks.
+
+\textbf{Access Layer:} Entry point for users and APIs, ensuring uniform access.  
+\textbf{API Gateway:} Manages authentication, load balancing, and, most importantly,\textit{task distribution} across parallel nodes.  
+\textbf{Parallel Core Services:} Traditional services (User, Notifications, Billing) operate normally, while the \textit{Search Cluster} executes queries using multiple search nodes in parallel, combining their results for faster responses.  
+\textbf{Parallel ML Subsystem:} AI tasks are split across multiple GPUs and nodes. The training and inference clusters run computations concurrently, supporting large-scale deep learning with frameworks such as Horovod or Ray.  
+\textbf{Infrastructure:} A distributed backend (Kubernetes, broker, scheduler, and databases) coordinates job scheduling, message passing, and synchronization between parallel nodes.
+
+By distributing workloads horizontally, DeepSeek achieves \textbf{true parallel execution}—reducing latency, improving scalability, and enabling real-time AI-driven search and analysis.
+\end{minipage}
+
+\end{document}
